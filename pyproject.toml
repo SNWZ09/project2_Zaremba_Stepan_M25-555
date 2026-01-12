@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "project2-zaremba-stepan-m25-555"
 version = "0.1.0"
-description = ""
+description = "Primitive database"
 authors = ["Stepan Zaremba <212485sz@mail.ru>"]
 readme = "README.md"
 packages = [

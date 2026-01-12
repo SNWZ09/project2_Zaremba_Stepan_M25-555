@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "project2-zaremba-stepan-m25-555"
+version = "0.1.0"
+description = ""
+authors = ["Stepan Zaremba <212485sz@mail.ru>"]
+readme = "README.md"
+packages = [
+    { include = "src" },
+]
+
+[tool.poetry.scripts]
+project = "src.primitive_db.main:main"
+
+
+[tool.poetry.dependencies]
+python = ">=3.12"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

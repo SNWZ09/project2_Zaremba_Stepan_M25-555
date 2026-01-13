@@ -19,8 +19,10 @@ def create_table(metadata, table_name, columns):
             col_name, col_type = col_def.split(':')
             schema[col_name] = col_type
         except ValueError:
-            # Обработка случая, если колонка задана неверно (например, 'name' вместо 'name:str')
-            raise ValueError(f"Неверный формат колонки: '{col_def}'. Ожидается 'имя:тип'.")
+            #обработка случая, если колонка задана неверно
+            #(например, 'name' вместо 'name:str')
+            raise ValueError(f'Неверный формат колонки: "{col_def}".'
+                    'Ожидается "имя:тип"')
     
     final_schema = {'id': 'int'}
     final_schema.update(schema)

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
 #импортируем созданные команды
-from .engine import welcome
+from .engine import run
 
 
 def main():
-    print("DB project is running!")
+    print('DB project is running!')
     
-    welcome()
+    run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

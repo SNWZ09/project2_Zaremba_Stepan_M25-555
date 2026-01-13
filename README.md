@@ -11,4 +11,4 @@
     help - справочная информация
 
 
-Asciinema: 
+Asciinema: [![asciicast](https://asciinema.org/a/7ZKhw70gULpSjjYy.svg)](https://asciinema.org/a/7ZKhw70gULpSjjYy)

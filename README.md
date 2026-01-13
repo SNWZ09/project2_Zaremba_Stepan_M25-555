@@ -1,5 +1,7 @@
 # project2_Zaremba_Stepan_M25-555
 
+Данный проект представляет собой создание и взаимодействие с примитивной базой данных.
+
 
 ## Управление таблицами
 
@@ -11,4 +13,9 @@
     help - справочная информация
 
 
-Asciinema: [![asciicast](https://asciinema.org/a/7ZKhw70gULpSjjYy.svg)](https://asciinema.org/a/7ZKhw70gULpSjjYy)
+
+
+
+Asciinema 1: [![asciicast](https://asciinema.org/a/7ZKhw70gULpSjjYy.svg)](https://asciinema.org/a/7ZKhw70gULpSjjYy)
+
+Asciinema 2: [![asciicast](https://asciinema.org/a/767654.svg)](https://asciinema.org/a/767654)

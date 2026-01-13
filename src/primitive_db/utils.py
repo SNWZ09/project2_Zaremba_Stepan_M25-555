@@ -1,6 +1,10 @@
 #импорт библиотеки, так как данные мы будем получать именно из json-файла
 import json
 
+#пришлось импортировать эту библиотеку, тк, судя по информации в интернете
+#она поможет в создании папок
+import os
+
 
 #загрузка данных из json-файла
 def load_metadata(filepath):
@@ -20,3 +24,37 @@ def save_metadata(filepath, data):
         
         #превразение словаря в json-файл  
         json.dump(data, f)
+        
+
+#функция, которая работает по аналогии с load_metadata, но + директория data
+def load_table_data(table_name):
+
+    #добавляем наш "путь" к папке, в остальном код такой же
+    filepath = f'data/{table_name}.json'
+    try:
+        #открываем файл
+        with open(filepath, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return data
+        
+    #если файл не найден - возвращает пустой словарь
+    except FileNotFoundError:
+        return []
+        
+        
+#функция, которая работает по аналогии с save_metadata, но + директория data
+def save_table_data(table_name, data):
+    
+    #создаем директорию data
+    #если такая уже есть - программа ничего не сделает
+    os.makedirs("data", exist_ok=True)
+    
+    #добавляем наш "путь" к папке, в остальном код такой же
+    filepath = f'data/{table_name}.json'
+    
+    with open(filepath, 'w', encoding='utf-8') as f:
+        
+        #превразение словаря в json-файл
+        json.dump(data, f)
+    
+    

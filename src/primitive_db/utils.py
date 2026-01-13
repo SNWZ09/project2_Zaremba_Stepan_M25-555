@@ -58,3 +58,22 @@ def save_table_data(table_name, data):
         json.dump(data, f)
     
     
+def create_cacher():
+
+    #тут будет храниться кэш
+    cache = {}
+        
+    def cache_result(key, value_func):
+        
+        #проверка результата функции в кэше по ключу
+        if key in cache:
+            print('Результат для этого запроса найден в кэше')
+            return cache[key]
+            
+        #если результата функции нет
+        else:
+            print('В кэше нет результата')
+            result = value_func()
+            cache[key] = result
+            return result
+    return cache_result

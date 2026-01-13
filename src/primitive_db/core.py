@@ -1,43 +1,37 @@
-#импортируем для красивого вывода таблиц в консоль
+#импортируем декораторы
+from ..decorators import confirm_action, handle_db_errors, log_time
+from .utils import create_cacher, load_table_data
 
+
+#создаем таблицу
+@handle_db_errors
 def create_table(metadata, table_name, columns):
-    
-    #проверяем, не существует ли уже таблица с таким именем
-    #решил это поставить в начале, тк мне кажется,
-    #что это более эффективное использование ресурсов компьютера
     if table_name in metadata:
-        raise ValueError(f'Error: Таблица "{table_name}" уже существует.')
-
-    #автоматически добавлять столбец ID:int в начало списка столбцов
-    id_column = {'ID': 'int'}
-
-    #обрабатываем каждый столбец из списка
-    for each_column in columns:
-    
-        #разделяем строку 'имя:тип' на две части
-        try:
-            col_name, col_type = each_column.split(':')
+        raise ValueError(f'Таблица "{table_name}" уже существует.')
         
-        #если .split() не вернул 2 элемента, значит формат неверный
-        #не знаю, как по-другому это нормально реализовать((
+    schema = {}
+    
+    if not columns:
+        raise ValueError("Нельзя создать таблицу без колонок.")
+
+    for col_def in columns:
+        try:
+            col_name, col_type = col_def.split(':')
+            schema[col_name] = col_type
         except ValueError:
-            raise ValueError(f'Некорректное значение в столбце "{each_column}". '
-                             'Столбец должен быть в формате "имя:тип".')
+            # Обработка случая, если колонка задана неверно (например, 'name' вместо 'name:str')
+            raise ValueError(f"Неверный формат колонки: '{col_def}'. Ожидается 'имя:тип'.")
+    
+    final_schema = {'id': 'int'}
+    final_schema.update(schema)
 
-        #если тип не 'int', 'str', 'bool' - возвращаем ошибку
-        if col_type not in {'int', 'str', 'bool'}:
-            raise ValueError(f'Некорректный тип: "{col_type}". '
-                             'Поддерживаемые типы: int, str, bool.')
-
-        #если всё норм - добавляем столбец в словарь
-        id_column[col_name] = col_type
-
-    metadata[table_name] = id_column
-
-    #возвращаем обновленные метаданные
+    metadata[table_name] = final_schema
+  
     return metadata
     
-#удаляем таблицу    
+#удаляем таблицу
+@handle_db_errors
+@confirm_action("удаление таблицы")
 def drop_table(metadata, table_name):
 
     #проверяем, существует ли таблица с таким именем
@@ -52,6 +46,8 @@ def drop_table(metadata, table_name):
 
 
 #добавляем новую запись в таблицу (добавил так же table_data)
+@handle_db_errors
+@log_time
 def insert(metadata, table_name, table_data, values):
 
     #проверяем, существует ли таблица с таким именем
@@ -116,20 +112,34 @@ def insert(metadata, table_name, table_data, values):
     
     return table_data, new_id
          
-        
-#выбирает данные из таблицы
-def select(table_data, where_clause=None):
-    if not where_clause:
-        return table_data
+_select_cacher = create_cacher()        
+#выбирает данные из таблицы, пришлось добавить столбцы для кэша
+@log_time
+def select(table_name, columns, where_clause=None):
+       
+    cache_key = (table_name, tuple(columns), str(where_clause))
+    
+    def selection_process():
+        table_data = load_table_data(table_name)
+        actual_columns = columns
 
-    where_key, where_value = list(where_clause.items())[0]
-    results = []
-    for row in table_data:
+        result_table = []
         
-        #приводим всё к строкам (на всякий-всякий случай, чтоб ничего не ругалось)
-        if where_key in row and str(row[where_key]) == str(where_value):
-            results.append(row)
-    return results
+        if not where_clause:
+            for row in table_data:
+                result_row = {col: row.get(col, 'N/A') for col in actual_columns}
+                result_table.append(result_row)
+        else:
+            where_key, where_value = list(where_clause.items())[0]
+            for row in table_data:
+                if where_key in row and str(row[where_key]) == str(where_value):
+                    result_row = {col: row.get(col, 'N/A') for col in actual_columns}
+                    result_table.append(result_row)
+        
+        return result_table
+
+    return _select_cacher(cache_key, selection_process)
+
 
 
 #обновляет данные в таблице
@@ -150,6 +160,8 @@ def update(table_data, set_clause, where_clause):
 
 
 #удаляет данные в таблице
+@handle_db_errors
+@confirm_action("удаление строки")
 def delete(table_data, where_clause):
 
     #проверяем, есть ли условие

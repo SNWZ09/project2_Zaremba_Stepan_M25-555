@@ -39,6 +39,9 @@ def run():
         
         #загружаем актуальную версию дб
         metadata =  utils.load_metadata('db_meta.json')
+        
+        if metadata is None:
+            metadata = {}
             
         try:
         
@@ -52,7 +55,7 @@ def run():
                 continue
                 
             elif command == 'create_table':
-                    
+                
                 table_name = args[1]
                 columns = args[2:]
                 
@@ -101,7 +104,8 @@ def run():
                 values = parser.parse_insert_values(args)
                 
                 table_data = utils.load_table_data(table_name)
-                updated_data, new_id = core.insert(metadata, table_name, table_data, values)
+                updated_data, new_id = core.insert(metadata, 
+                                                        table_name, table_data, values)
                 utils.save_table_data(table_name, updated_data)
                 
                 print(f'Запись с ID={new_id} успешно добавлена в {table_name}.')
